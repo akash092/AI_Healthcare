@@ -49,32 +49,6 @@ def get_options_analysis_prompt(question, options, op_domain, question_analysis)
                     f"A handful of these options might seem right on the first glance but could potentially be misleading in reality."
     return option_analyzer, prompt_get_options_analyses
 
-
-def get_final_answer_prompt_analonly(question, options, question_analyses, option_analyses):
-    prompt = f"Question: {question} \nOptions: {options} \n" \
-        f"Answer: Let's work this out in a step by step way to be sure we have the right answer. \n" \
-        f"Step 1: Decode the question properly. We have a team of experts who have done a detailed analysis of this question. " \
-        f"The team includes five experts from different medical domains related to the problem. \n"
-    
-    for _domain, _analysis in question_analyses.items():
-        prompt += f"Insight from an expert in {_domain} suggests, {_analysis} \n"
-    
-    prompt += f"Step 2: Evaluate each presented option individually, based on both the specifics of the patient's scenario as well as your medical knowledge. " \
-            f"Pay close attention to discerning the disparities among the different options. " \
-            f"A handful of these options might seem right on the first glance but could potentially be misleading in reality. " \
-            f"We have detailed analyses from experts across two domains. \n"
-    
-    for _domain, _analysis in option_analyses.items():
-        prompt += f"Assessment from an expert in {_domain} suggests, {_analysis} \n"
-    prompt += f"Step 3: Based on the understanding gathered from the above steps, select the optimal choice to answer the question. \n" \
-        f"Points to note: \n" \
-        f"1. The analyses provided should guide you towards the correct response. \n" \
-        f"2. Any option containing incorrect information inherently cannot be the correct choice. \n" \
-        f"3. Please respond only with the selected option's letter, like A, B, C, D, or E, using the following format: '''Option: [Selected Option's Letter]'''. " \
-        f"Remember, it's the letter we need, not the full content of the option."
-
-    return prompt
-
 def get_final_answer_prompt_wsyn(syn_report):
     prompt = f"Here is a synthesized report: {syn_report} \n" \
         f"Based on the above report, select the optimal choice to answer the question. \n" \
@@ -84,23 +58,6 @@ def get_final_answer_prompt_wsyn(syn_report):
         f"3. Please respond only with the selected option's letter, like A, B, C, D, or E, using the following format: '''Option: [Selected Option's Letter]'''. " \
         f"Remember, it's the letter we need, not the full content of the option."
     return prompt
-
-
-def get_direct_prompt(question, options):
-    prompt = f"Question: {question} \n" \
-        f"Options: {options} \n" \
-        f"Please respond only with the selected option's letter, like A, B, C, D, or E, using the following format: '''Option: [Selected Option's Letter]'''."
-    return prompt
-
-def get_cot_prompt(question, options):
-    cot_format = f"Thought: [the step-by-step thoughts] \n" \
-                f"Answer: [Selected Option's Letter (like A, B, C, D, or E)] \n"
-    prompt = f"Question: {question} \n" \
-        f"Options: {options} \n" \
-        f"Answer: Let's work this out in a step by step way to be sure we have the right answer. " \
-        f"You should output in exactly the same format as '''{cot_format}'''"
-    return prompt
-
 
 def get_synthesized_report_prompt(question_analyses, option_analyses):
     synthesizer = "You are a medical decision maker who excels at summarizing and synthesizing based on multiple experts from various domain experts."
@@ -134,8 +91,6 @@ def get_consensus_opinion_prompt(domain, syn_report):
         f"You should output in exactly the same format as '''Revisions: [proposed revision advice] '''"
     return opinion_prompt
 
-
-#revision_prompt = get_revision_prompt(revision_advice)
 
 def get_revision_prompt(syn_report, revision_advice):
     revision_prompt = f"Here is the original report: {syn_report}\n\n"

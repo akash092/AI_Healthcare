@@ -9,12 +9,12 @@ from utils import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', default='chatgpt')
+    parser.add_argument('--model_name', default='gpt4.1')
     parser.add_argument('--dataset_name', default='MedQA')
     parser.add_argument('--dataset_dir', default='./datasets/MedQA/')
-    parser.add_argument('--start_pos', type=int, default=21)
-    parser.add_argument('--end_pos', type=int, default=50)
-    parser.add_argument('--output_files_folder', default='./outputs/MedQA')
+    parser.add_argument('--start_pos', type=int, default=0)
+    parser.add_argument('--end_pos', type=int, default=1)
+    parser.add_argument('--output_files_folder', default='.')
 
     parser.add_argument('--method', type=str, default='syn_verif', choices=['syn_verif', 'syn_only', 'anal_only', 'base_direct', 'base_cot'])
     parser.add_argument('--max_attempt_vote', type=int, default=3)
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     print(args)
 
     ### get handler
-    if args.model_name in ['instructgpt', 'newinstructgpt', 'chatgpt', 'gpt4']: # select the model
+    if args.model_name in ['instructgpt', 'newinstructgpt', 'chatgpt', 'gpt4.1']: # select the model
         handler = api_handler(args.model_name)
     else:
         raise ValueError
@@ -46,20 +46,20 @@ if __name__ == '__main__':
         question = raw_sample['question'] if raw_sample['question'][-1] in punctuation else raw_sample['question'] + '?'
         
         realqid = idx
-        if args.dataset_name in ['MedQA', 'MedMCQA'] or 'MMLU' in args.dataset_name:
+        if args.dataset_name == 'MedQA':
             options = raw_sample['options']
             gold_answer = raw_sample['answer_idx']
-            data_info = fully_decode(idx, realqid, question, options, gold_answer, handler, args, dataobj)
+            data_info = fully_decode(question, options, gold_answer, handler, args.dataset_name, args.max_attempt_vote)
         elif args.dataset_name == 'PubMedQA':
+            # TODO: create dataset in the needed format
+            # Will have question and gold_answer since options are {'A': 'Yes', 'B': 'No', 'C': 'Maybe'}
             question = raw_sample['context'] + ' ' + question
             options = raw_sample['options']
             gold_answer = raw_sample['answer_idx']
-            data_info = fully_decode(idx, realqid, question, options, gold_answer, handler, args, dataobj)
-        elif args.dataset_name in ['MedicationQA']:
-            options = ''
-            gold_answer = raw_sample['answer_idx']
-            data_info = fully_decode(idx, realqid, question, options, gold_answer, handler, args, dataobj)
+            data_info = fully_decode(question, options, gold_answer, handler, args.dataset_name, args.max_attempt_vote)
 
         record = json.dumps(data_info)
         with open(exact_output_file, 'a') as f:
             f.write(record + '\n')
+        
+        #TODO add accuracy score computation 

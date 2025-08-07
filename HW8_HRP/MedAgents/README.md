@@ -30,7 +30,7 @@ Please check our Google Drive: https://drive.google.com/file/d/11qNzDYIlimGGJ1fh
 
 
 ## Implementations
-Input your own openai api key in api_utils.py.
+Input your own openai api key in env variable OPENAI_API_KEY which will be used by OpenAI client
 ```
 sh inference.sh
 ```

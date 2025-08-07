@@ -3,3 +3,4 @@ HW7_LLM/data_synergy.csv
 HW7_LLM/10k_synthea_covid19_csv
 HW7_LLM/synthea_sample_data_csv_latest*
 secrets.txt
+*.pyc
