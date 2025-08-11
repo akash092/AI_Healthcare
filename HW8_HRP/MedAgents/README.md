@@ -1,18 +1,8 @@
-# [ACL 2024 Findings] MedAgents: Large Language Models as Collaborators for Zero-shot Medical Reasoning
-
-<p align="center">
-   📖 <a href="https://arxiv.org/abs/2311.10537" target="_blank">Paper</a>  
-</p>
+# Large Language Models with Retrieval Augmented Agents among Collaborators for Medical Reasoning
 
 
-We propose a **Multi-disciplinary Collaboration (MC)** framework. The framework works in five stages: 
-(i) expert gathering: gather experts from distinct disciplines according to the clinical question;
-(ii) analysis proposition: domain experts put forward their own analysis with their expertise;
-(iii) report summarization: compose a summarized report on the basis of a previous series of analyses;
-(iv) collaborative consultation: engage the experts in discussions over the summarized report. The report will be revised iteratively until an agreement from all the experts is reached;
-(v) decision making: derive a final decision from the unanimous report.
+We build collaborative LLM agents that combine intrinsic LLM knowledge with RAG-sourced medical data to produce consistent, reliable answers through collaborative, training-free reasoning.
 
-![](pics/overview.png)
 
 ## Requirements
 
@@ -24,26 +14,12 @@ pip install -r requirements.txt
 
 ## Data
 
-We evaluate our MC framework on two benchmark datasets MedQA, MedMCQA, and PubMedQA, as well as six subtasks most relevant to the medical domain from MMLU datasets including anatomy, clinical knowledge, college medicine, medical genetics, professional medicine, and college biology.
-
-Please check our Google Drive: https://drive.google.com/file/d/11qNzDYIlimGGJ1fhQn2ux6w_rfFgJbyo/view?usp=sharing
+We evaluate our framework on two benchmark datasets MedQA and PubMedQA. Both the dataset is located in datasets folder.
 
 
 ## Implementations
-Input your own openai api key in env variable OPENAI_API_KEY which will be used by OpenAI client
+Input your own openai api key in env variable OPENAI_API_KEY which will be used by OpenAI client. From the root folder, run the below to execute code.
 ```
-sh inference.sh
-```
-
-## Cite Us
-If you find this project useful, please cite the following paper:
-
-```
-@article{tang2023MedAgents,
-      title={ML-MedAgents: Large Language Models as Collaborators for Zero-shot Medical Reasoning}, 
-      author={Xiangru Tang and Anni Zou and Zhuosheng Zhang and Yilun Zhao and Xingyao Zhang and Arman Cohan and Mark Gerstein},
-      year={2023},
-      journal={arXiv preprint arXiv:2311.10537},
-}
+python run.py
 ```
 

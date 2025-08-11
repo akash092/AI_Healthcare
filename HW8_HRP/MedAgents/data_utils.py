@@ -17,16 +17,6 @@ class MyDataset:
         self.dir_path = args.dataset_dir
         self.split = split  # train / test
         self.load() # load dataset -> load data in self.data
-        # load answers -> self.choice_ref / self.ref
-        if args.dataset_name == 'MedQA':
-            self.build_choice_ref_MedQA()
-        elif args.dataset_name == 'MedMCQA' or 'MMLU' in args.dataset_name:
-            self.build_choice_ref_MedMCQA()
-        elif args.dataset_name == 'PubMedQA':
-            self.build_choice_ref_MedMCQA()
-        elif args.dataset_name == 'MedicationQA':
-            self.build_ref()
-        
 
     def load(self): # load dataset -> self.data
         filename = os.path.join(self.dir_path, self.split + '.jsonl')
@@ -40,90 +30,6 @@ class MyDataset:
 
     def __len__(self):
         return len(self.data)
-
-    def build_ref(self):
-        self.ref = []
-        for i in range(len(self)):
-            item = self.get_by_idx(i)
-            self.ref.append({'answers': {'text': item['answer']}, 'id': i})
-    
-    def build_choice_ref_MedQA(self):
-        self.choice_ref = []
-        for i in range(len(self)):
-            item = self.get_by_idx(i)
-            self.choice_ref.append({
-                'answers': {'text': item['answer'],'choice': item['answer_idx']}, 
-                'options': item['options'], 
-                'type': item['meta_info'],
-                'id': i})
-
-    def build_choice_ref_MedMCQA(self):
-        self.choice_ref = []
-        for i in range(len(self)):
-            item = self.get_by_idx(i)
-            self.choice_ref.append({
-                'answers': {'text': item['answer'],
-                'choice': item['answer_idx']}, 
-                'options': item['options'], 
-                'id': i})
-
-    def compute_rougescore(self, preds):
-        sum_score = 0.0
-        scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-        for i, answer in enumerate(preds):
-            correct_answer = self.ref[i]['answers']['text']
-            # correct_answer = correct_answer.replace('\n', ' ')
-            score = scorer.score(answer, correct_answer)
-            sum_score += score['rouge1'].fmeasure
-            # print(f'id: {i}, answer: {answer}, correct answer: {correct_answer}, rouge1 score: {score["rouge1"].fmeasure}')
-            # print(score)
-            # break
-        return sum_score / len(preds)
-
-    def compute_accuracy(self, preds):
-        if 'PubMedQA' in self.dir_path:
-            correct_num = 0.0
-            all_num = 0.0
-            for i, answer in enumerate(preds):
-                all_num += 1
-                correct_choice = self.choice_ref[i]['answers']['choice']
-                correct_answer = self.choice_ref[i]['answers']['text']
-                if answer == correct_choice or correct_answer in answer:
-                    correct_num += 1
-                # print(f"id: {i}, choice: {answer}, correct choice: {correct_choice}")
-            print(f"correct_num: {correct_num}, all_num: {all_num}")
-            return correct_num / all_num
-        elif 'MedQA' in self.dir_path:
-            correct_num = {'step1': 0.0, 'step2&3': 0.0, 'all': 0.0}
-            all_num = {'step1': 0.0, 'step2&3': 0.0, 'all': 0.0}
-            for i, answer in enumerate(preds):
-                # choice = answer[:3]
-                answer = answer.strip()
-                all_num['all'] += 1
-                correct_choice = self.choice_ref[i]['answers']['choice']
-                correct_answer = self.choice_ref[i]['answers']['text']
-                type = self.choice_ref[i]['type']
-                all_num[type] += 1
-                if answer == correct_choice or (correct_choice in answer and answer != 'ERROR') or correct_answer in answer:
-                    correct_num[type] += 1
-                    correct_num['all'] += 1
-                # print(f"id: {i}, choice: {answer}, correct choice: {correct_choice}")
-            print(f"correct_num: {correct_num}, all_num: {all_num}")
-            return [correct_num[key] / all_num[key] for key in ['step1', 'step2&3', 'all']]
-        elif 'MedMCQA' in self.dir_path or 'MMLU' in self.dir_path:
-            correct_num = 0.0
-            all_num = 0.0
-            for i, answer in enumerate(preds):
-                # choice = answer[:3]
-                all_num += 1
-                correct_choice = self.choice_ref[i]['answers']['choice']
-                correct_answer = self.choice_ref[i]['answers']['text']
-                if answer == correct_choice or correct_answer in answer:
-                    correct_num += 1
-                # print(f"id: {i}, choice: {answer}, correct choice: {correct_choice}")
-            print(f"correct_num: {correct_num}, all_num: {all_num}")
-            return correct_num / all_num
-
 
 
 def remove_incomplete_sentence(text):

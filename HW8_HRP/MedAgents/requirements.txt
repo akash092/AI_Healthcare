@@ -4,3 +4,7 @@ numpy
 rouge-score
 jsonlines
 tqdm
+langchain
+langchain-community
+tiktoken
+faiss-cpu
