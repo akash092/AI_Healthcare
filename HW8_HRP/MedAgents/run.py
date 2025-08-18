@@ -61,7 +61,7 @@ if __name__ == '__main__':
     test_range = range(args.start_pos, end_pos)  # closed interval
 
     ### set output_file_name
-    exact_output_file = f"{args.output_files_folder}/{args.model_name}"
+    exact_output_file = f"{args.output_files_folder}/{args.model_name}.json"
 
     total_questions = 0
     correct = 0
